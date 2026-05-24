@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>SITTA UT - Stok Bahan Ajar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app" class="container">
+        <nav>
+            <a href="index.html">Menu Utama</a>
+            <a href="tracking.html">Tracking DO</a>
+        </nav>
+
+        <h2>Halaman Stok Bahan Ajar</h2>
+
+        <div class="filter-box">
+            <h3>Filter & Sort Data Stock</h3>
+            <div class="form-group">
+                <label>Pilih UT-Daerah (UPBJJ):</label>
+                <select v-model="filterupbjj">
+                    <option value="">-- Semua Wilayah --</option>
+                    <option v-for="u un upbjjList" :key="u.id" :value="u.name">{{ u.name }}</option>
+                </select>
+            </div>
+
+            <div class="form-group" v-if="filterupbjj">
+                <label>Kategori Mata Kuliah:</label>
+                <select v-model="filterKategori">
+                    <option value="">-- Semua Kategori --</option>
+                    <option value="Sistem Informasi">Sistem Informasi</option>
+                    <option value="Teknik Informatika">Teknik Informatika</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Urutkan (Sort) Berdasarkan:</label>
+                <select v-model="sortBy">
+                    <option value="">-- Tanpa Urutan --</option>
+                    <option value="judul">Judul Mata Kuliah</option>
+                    <option value="qty">Jumlah Stok</option>
+                    <option value="harga">Harga</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-secondary" @click="resetFilter">Reset Filter</button>
+        </div>
+
+        <h3>Daftar Stok Bahan Ajar</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode MK</th>
+                    <th>Nama Mata Kuliah</th>
+                    <th>Kategori</th>
+                    <th>UT-Daerah</th>
+                    <th>Lokasi Rak</th>
+                    <th>Stok (Qty)</th>
+                    <th>Safety</th>
+                    <th>Harga</th>
+                    <th>Status</th>
+                    <th>Catatan</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in filterAndSortedStok" :key="item.kode">
+                    <td>{{ item.kode }}</td>
+                    <td>{{ item.judul }}</td>
+                    <td>{{ item.kategori }}</td>
+                    <td>{{ item.upbjj }}</td>
+                    <td>{{ item.lokasiRak }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>{{ item.safety }}</td>
+                    <td>Rp {{ item.harga }}</td>
+                    <td>
+                        <span v-if="item.qty == 0" class="status-kosong">X Kosong</span>
+                        <span v-else-if="item.qty < item.safety" class="status-menipis">! Menipis</span>
+                        <span v-else class="status-aman">V Aman</span>
+                    </td>
+                    <td v-html="item.catatanHTML"></td>
+                    <td>
+                        <button type="button" class="btn-secondary" @click="editStok(item)">Edit</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="form-box">
+            <h3>{{ idEdit ? 'Form Edit Data Stok' : 'Form Tambah Data Bahan Ajar Baru' }}</h3>
+            <form @submit.prevent="saveData">
+                <div class="form-group">
+                    <label>Kode Mata Kuliah:</label>
+                    <input type="text" v-model="form.kode" :disabled="isEdit" required>
+                </div>
+                <div class="form-group">
+                    <label>Nama Mata Kuliah / Judul:</label>
+                    <input type="text" v-model="form.judul" required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori:</label>
+                    <input type="text" v-model="form.kategori" required>
+                </div>
+                <div class="form-group">
+                    <label>UT-Daerah (UPBJJ):</label>
+                    <select v-model="form.upbjj" required>
+                        <option v-for="u in upbjjList" :key="u.id" :value="u.name">{{ u.name }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lokasi Rak:</label>
+                    <input type="text" v-model="form.lokasiRak" required>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah Stok (Qty):</label>
+                    <input type="number" v-model.number="form.qty" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Safety Stock:</label>
+                    <input type="number" v-model.number="form.safety" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Harga (Rp):</label>
+                    <input type="number" v-model.number="form.harga" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Catatan (Format HTML Diperbolehkan):</label>
+                    <input type="text" v-model="form.catatanHTML">
+                </div>
+
+                <button type="submit">{{ isEdit ? 'Simpan Perubahan' : 'Tambah Data' }}</button>
+                <button type="button" class="btn-secondary" v-if="isEdit" @click="cancelEdit">Batal</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/dataBahanAjar.js"></script>
+    <script src="js/stok-app.js"></script>
+</body>
+</html>

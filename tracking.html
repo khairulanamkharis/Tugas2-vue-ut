@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>SITTA UT - Tracking Delivery Order</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app" class="container">
+        <nav>
+            <a href="index.html">Menu Utama</a>
+            <a href="stok.html">Stok Bahan Ajar</a>
+        </nav>
+
+        <h2>Tracking Delivery Order (DO) Bahan Ajar</h2>
+
+        <h3>Daftar Pengiriman DO</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nomor DO</th>
+                    <th>NIM</th>
+                    <th>Nama Mahasiswa</th>
+                    <th>Ekspedisi</th>
+                    <th>Paket Bahan Ajar</th>
+                    <th>Tanggal Kirim</th>
+                    <th>Total Harga</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="doItem in trackingList" :key="doItem.doNum">
+                    <td>{{ doItem.doNum }}</td>
+                    <td>{{ doItem.nim }}</td>
+                    <td>{{ doItem.nama }}</td>
+                    <td>{{ doItem.ekspedisi }}</td>
+                    <td>{{ doItem.paketNama }}</td>
+                    <td>{{ doItem.tglKirim }}</td>
+                    <td>Rp {{ doItem.totalHarga }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="form-box">
+            <h3>Formulir Input Delivery Order Baru</h3>
+            <form @submit.prevent="submitDO">
+                <div class="form-group">
+                    <label>Nomor DO (Otomatis):</label>
+                    <input type="text" :value="nextDONumber" disabled style="background-color: #e9ecef;">
+                </div>
+
+                <div class="form-group">
+                    <label>NIM Mahasiswa:</label>
+                    <input type="text" :v-model="form.nim" placeholder="Masukkan NIM Secara Manual" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Mahasiswa:</label>
+                    <input type="text" :v-model="form.nama" placeholder="Masukkan Nama Secara Manual" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Ekspedisi Pengiriman:</label>
+                    <select v-model="form.ekspedisi" required>
+                        <option value="JNE Regular">JNE Regular</option>
+                        <option value="JNE Express">JNE Express</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Pilih Paket Bahan Ajar:</label>
+                    <select v-model="form.paketKode" required>
+                        <option value="">-- Silahkan Pilih Paket --</option>
+                        <option v-for="p in paketList" :key="p.kode" :value="p.kode">
+                            {{ p.kode }} - {{ p.nama }}
+                        </option>
+                    </select>
+                </div>
+
+                <div v-if="selectedPaketInfo" style="marigin-top: 10px; padding: 10px; background: #e2e3e5; border-left: 5px solid #004085;">
+                    <strong>Detail Isi Paket:</strong> {{ selectedPaketInfo.isi }} <br>
+                    <strong>Harga Paket:</strong> Rp {{ selectedPaketInfo.harga }}
+                </div>
+
+                <div class="form-group">
+                    <label>Tanggal Kirim:</label>
+                    <input type="date" :v-model="form.tglKirim" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Total Harga Terhitung (Otomatis):</label>
+                    <input type="text" :value="'Rp ' + calculatedPrice" disabled style="background-color: #e9ecef;">
+                </div>
+
+                <button type="submit">Tambahkan Data Tracking</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/dataBahanAjar.js"></script>
+    <script src="js/tracking-app.js"></script>
+</body>
+</html>
